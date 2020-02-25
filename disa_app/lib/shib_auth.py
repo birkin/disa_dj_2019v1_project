@@ -107,17 +107,25 @@ class LoginDecoratorHelper(object):
         usrnm = meta_dct['Shibboleth-eppn']
         log.debug( 'usrnm-b, `%s`' % usrnm )
         try:
-            usr, created = User.objects.get_or_create( username=usrnm )
-        except Exception as e:
-            msg = 'exception, ```%s```' % e
-            log.debug( msg )
+            # shib_email = meta_dct.get( 'Shibboleth-mail', 'foo@foo.foo' )
+            shib_email = meta_dct.get( 'Shibboleth-mail', None )
+            if shib_email == None:
+                shib_email = 'no_email_eppn_%s' % meta_dct['Shibboleth-eppn']
+            usr, created = User.objects.get_or_create( username=usrnm, email=shib_email )
+        except:
+            log.exception( 'problem on get_or_create(); traceback follows; processing will continue...' )
             # raise Exception( msg )
-        netid = meta_dct['Shibboleth-brownNetId']
-        if netid in settings_app.SUPER_USERS:
+        # netid = meta_dct['Shibboleth-brownNetId']
+        # if netid in settings_app.SUPER_USERS:
+        #     usr.is_superuser = True
+        # if netid in settings_app.STAFF_USERS:
+        #     usr.is_staff = True
+        eppn = meta_dct['Shibboleth-eppn']
+        if eppn in settings_app.SUPER_USERS:
             usr.is_superuser = True
-        if netid in settings_app.STAFF_USERS:
+        if eppn in settings_app.STAFF_USERS:
             usr.is_staff = True
-        # usr.is_staff = True  # use this and comment out the two lines above if, say, you define a shib-group to be able to log-in
+        # usr.is_staff = True  # use this and comment out the lines above if, say, you define a shib-group to be able to log-in
         try:
             usr = self.update_user( usr, meta_dct )
         except Exception as e:
@@ -139,11 +147,15 @@ class LoginDecoratorHelper(object):
             Called by update_userobj() """
         usr.first_name = meta_dct.get( 'Shibboleth-givenName', '' )
         usr.last_name = meta_dct.get( 'Shibboleth-sn', '' )
-        usr.email = meta_dct['Shibboleth-mail']
+        # usr.email = meta_dct['Shibboleth-mail']
+        # email = meta_dct.get( 'Shibboleth-mail', None )
+        # if email == None:
+        #     email = 'no_email_eppn_%s' % meta_dct['Shibboleth-eppn']
+        # usr.email = email
         usr.set_unusable_password()
-        usr.save()
-        grp = Group.objects.get( name=settings_app.STAFF_GROUP )  # group must exist; TODO: autocreate if it doesn't
-        grp.user_set.add( usr )
+        # usr.save()  # no need here; save happens above
+        # grp = Group.objects.get( name=settings_app.STAFF_GROUP )  # group must exist; TODO: autocreate if it doesn't
+        # grp.user_set.add( usr )
         log.debug( 'user updated' )
         return usr
 

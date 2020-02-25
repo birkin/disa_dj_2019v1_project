@@ -38,7 +38,7 @@ def query_documents( username: str, old_usr_db_id: int ) -> dict:
     srtd_user = sort_documents( user_cites )
     data['user_documents'] = jsonify_entries( srtd_user[0:10] )
     data['documents'] = jsonify_entries( srtd_all )
-    log.debug( f'data, ```{pprint.pformat(data)}```' )
+    log.debug( f'data (first 1K chars), ```{pprint.pformat(data)[0:1000]}...```' )
     return data
 
 
@@ -89,7 +89,7 @@ def jsonify_entries( doc_list ) -> list:
             'doc': {'id': citation_obj.id, 'display': citation_obj.display, 'reference_count': len(citation_obj.references) }
             }
         jsonified_entries.append( entry_dct )
-    log.debug( f'jsonified_entries, ```{pprint.pformat(jsonified_entries)}```' )
+    log.debug( f'jsonified_entries (first 3), ```{pprint.pformat(jsonified_entries[0:3])}```' )
     return jsonified_entries
 
 
