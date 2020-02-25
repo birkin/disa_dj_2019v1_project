@@ -28,16 +28,26 @@ class UserProfile( models.Model ):
     old_db_id = models.IntegerField( null=True, blank=True )
     last_logged_in = models.DateTimeField( auto_now=True )
 
-## auto create and save UserProfile entries
 
 @receiver( post_save, sender=User )
 def create_user_profile(sender, instance, created, **kwargs):
-    log.debug( 'starting create_user_profile()' )
-    if created:
+    log.debug( f'starting create_user_profile(); created, ```{created}```; kwargs, ```{kwargs}```' )
+    if created:  # meaning a User object was created
         log.debug( '`created` was True' )
-        UserProfile.objects.create(user=instance)
+        log.debug( f'instance, ```{pprint.pformat(instance.__dict__)}```' )
+        try:  # see if there is an existing user-profile to associate -- this allows for user-profiles to be pre-created, and associated with the correct user-id when the user first logs in.
+            prfl = UserProfile.objects.get( email=instance.email )
+            if prfl.user != instance:
+                prfl.user = instance
+                prfl.save()
+                log.debug( 'pre-existing user-profile has been matched to user' )
+        except:
+            log.exception( 'user has no matching user-profile, so one will be created (traceback follows; processing will continue)' )
+            UserProfile.objects.create( user=instance )
 
 @receiver( post_save, sender=User )
 def save_user_profile(sender, instance, **kwargs):
-    log.debug( 'starting save_user_profile()' )
+    log.debug( f'starting save_user_profile(); kwargs, ```{kwargs}```' )
+    log.debug( f'instance, ```{pprint.pformat(instance.__dict__)}```' )
+    instance.profile.email = instance.email  # in case preferred shib email is updated.
     instance.profile.save()
