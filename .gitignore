@@ -3,4 +3,4 @@
 .hg
 .svn
 env
-migrations
+#migrations
