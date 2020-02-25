@@ -21,8 +21,8 @@ class UserProfile( models.Model ):
       `users = User.objects.all().select_related('profile')`
       ...to minimize extra db queries.
     """
-    # user = models.OneToOneField( User, on_delete=models.CASCADE, related_name='profile' )
-    user = models.OneToOneField( User, on_delete=models.CASCADE, related_name='profile', null=True, blank=True )  # null=True so I can pre-create the user-profile entries if desired
+    # user = models.OneToOneField( User, on_delete=models.CASCADE, related_name='profile', null=True, blank=True )  # null=True so I can pre-create the user-profile entries if desired
+    user = models.OneToOneField( User, on_delete=models.SET_NULL, related_name='profile', null=True, blank=True )  # null=True so I can pre-create the user-profile entries if desired
     uu_id = models.UUIDField( default=uuid.uuid4, editable=False )
     email = models.EmailField( default='', blank=True )
     old_db_id = models.IntegerField( null=True, blank=True )
