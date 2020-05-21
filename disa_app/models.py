@@ -25,7 +25,7 @@ class UserProfile( models.Model ):
     uu_id = models.UUIDField( default=uuid.uuid4, editable=False )
     email = models.EmailField( default='', blank=True )
     old_db_id = models.IntegerField( null=True, blank=True )
-    # can_delete_doc = models.BooleanField( default=False )
+    can_delete_doc = models.BooleanField( default=False )
     last_logged_in = models.DateTimeField( null=True, blank=True )
 
 
