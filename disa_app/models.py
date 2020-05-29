@@ -51,3 +51,21 @@ def save_user_profile(sender, instance, **kwargs):
     log.debug( f'instance, ```{pprint.pformat(instance.__dict__)}```' )
     instance.profile.email = instance.email  # in case preferred shib email is updated.
     instance.profile.save()
+
+## end of UserProfile() and decorated methods
+
+
+class MarkedForDeletion( models.Model ):
+    """ Indicates main DB records marked for deletion, and, eventually, saves jsonized document-data. """
+    old_db_id = models.IntegerField()
+    doc_uu_id = models.UUIDField( default=uuid.uuid4, editable=True )
+    json_data = models.TextField()
+
+    def save(self, *args, **kwargs):
+        try:
+            json.loads( json_data )
+            super( MarkedForDeletion, self ).save()
+        except:
+            message = 'problem saving entered json'
+            log.exception( f'{message}; traceback follows; processing will halt' )
+            raise Exception( message )
