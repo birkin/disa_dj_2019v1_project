@@ -63,7 +63,7 @@ class MarkedForDeletion( models.Model ):
 
     def save(self, *args, **kwargs):
         try:
-            json.loads( json_data )
+            json.loads( self.json_data )
             super( MarkedForDeletion, self ).save()
         except:
             message = 'problem saving entered json'
