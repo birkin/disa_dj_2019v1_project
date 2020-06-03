@@ -57,15 +57,25 @@ def save_user_profile(sender, instance, **kwargs):
 
 class MarkedForDeletion( models.Model ):
     """ Indicates main DB records marked for deletion, and, eventually, saves jsonized document-data. """
+    id = models.UUIDField( primary_key=True, default=uuid.uuid4, editable=False )
     old_db_id = models.IntegerField()
     doc_uu_id = models.UUIDField( default=uuid.uuid4, editable=True )
-    json_data = models.TextField()
+    doc_json_data = models.TextField()
+    patron_json_data = models.TextField()
+    create_date = models.DateTimeField( auto_now_add=True )
 
     def save(self, *args, **kwargs):
         try:
-            json.loads( self.json_data )
-            super( MarkedForDeletion, self ).save()
+            json.loads( self.doc_json_data )
         except:
-            message = 'problem saving entered json'
+            message = 'problem saving entered doc_json_data'
             log.exception( f'{message}; traceback follows; processing will halt' )
             raise Exception( message )
+        try:
+            json.loads( self.patron_json_data )
+        except:
+            message = 'problem saving entered patron_json_data'
+            log.exception( f'{message}; traceback follows; processing will halt' )
+            raise Exception( message )
+        super( MarkedForDeletion, self ).save()
+
