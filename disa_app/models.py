@@ -60,8 +60,8 @@ class MarkedForDeletion( models.Model ):
     id = models.UUIDField( primary_key=True, default=uuid.uuid4, editable=False )
     old_db_id = models.IntegerField()
     doc_uu_id = models.UUIDField( default=uuid.uuid4, editable=True )
-    doc_json_data = models.TextField()
-    patron_json_data = models.TextField()
+    doc_json_data = models.TextField( default="{}" )
+    patron_json_data = models.TextField( default="{}" )
     create_date = models.DateTimeField( auto_now_add=True )
 
     def save(self, *args, **kwargs):
